@@ -1,11 +1,13 @@
 import './style.css'
 import * as THREE from 'three';
+import * as TWEEN from '@tweenjs/tween.js';
 //import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import WebGL from 'three/addons/capabilities/WebGL.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+import { Mesh } from 'three';
 
 let textMesh, pControl, scene, camera, renderer, clock, direction_light, portalLight, portalLight1;
 let portalParticles = [], smokeParticles = [];
@@ -13,7 +15,7 @@ let portalParticles = [], smokeParticles = [];
 function initScene() {
   scene = new THREE.Scene();
   //scene.background = new THREE.Color(0x000000);
-  //scene.fog = new THREE.Fog(0x000000, 0, 10000);
+  scene.fog = new THREE.Fog(0x000000, 0, 10000);
   camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 1000);
   camera.position.z = 1000;
 
@@ -89,22 +91,49 @@ const loader = new FontLoader();
 
 loader.load('https://threejs.org/examples/fonts/optimer_regular.typeface.json', function (font) {
 
-  const textGeometry = new TextGeometry('Project X', {
+  const textGeometry = new TextGeometry('Martin Echeverria', {
     font: font,
-    size: 20,
+    size: 14,
     height: 1
   });
-  const textMaterial = new THREE.MeshLambertMaterial({ color: 0xff0fff });
+  const textMaterial = new THREE.MeshLambertMaterial({ color: 0x6CB8F3 });
   textMesh = new THREE.Mesh(textGeometry, textMaterial);
-  textMesh.position.set(-52.5, 0, -1000);
+  //textMesh.position.set(-52.5, 0, 950);
   scene.add(textMesh);
+
+  const textTween = new TWEEN.Tween({ x: getPositionCenter(textMesh), y: 0, z: -150 })
+    .to({ x: getPositionCenter(textMesh), y: 0, z: 950 }, 4000)
+    .easing(TWEEN.Easing.Bounce.Out);
+
+  const updateMovimiento = (object) => {
+    textMesh.position.set(object.x, object.y, object.z)
+  };
+
+  textTween.onUpdate(updateMovimiento);
+
+  textTween.start();
 });
+
+function getPositionCenter(objectMesh) {
+  // Access the geometry of the Mesh object
+  const geometry = objectMesh.geometry;
+
+  // Get the bounds of the object based on its geometry
+  geometry.computeBoundingBox();
+
+  // Get the object's width in the X-axis
+  const sizeX = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
+
+  // Calculate the X position to center the object
+  return (-sizeX / 2);
+}
 
 window.addEventListener('resize', onWindowResize);
 
 // Variables de rebote
 let cant = 0;
 function animate() {
+  TWEEN.update();
   requestAnimationFrame(animate);
 
   let delta = clock.getDelta();
@@ -118,12 +147,12 @@ function animate() {
   if (Math.random() > 0.9)
     portalLight.power = 350 + Math.random() * 500;
 
-  if (textMesh.position.z <= 950) {
-    textMesh.position.z += (cant > 0 && cant<= 1) ? 0.8 : (cant >1 && cant <=2) ? 0.5 : 5.5;
-  }else if (cant < 2){
-    cant++;
-    textMesh.position.z = 935
-  }
+  /*   if (textMesh.position.z <= 950) {
+      textMesh.position.z += (cant > 0 && cant<= 1) ? 0.8 : (cant >1 && cant <=2) ? 0.5 : 5.5;
+    }else if (cant < 2){
+      cant++;
+      textMesh.position.z = 935
+    } */
 
   //camera.lookAt(space.position);
   renderer.render(scene, camera);
