@@ -128,7 +128,22 @@ function getPositionCenter(objectMesh) {
   return (-sizeX / 2);
 }
 
+function enterPortal() {
+  const cameraTween = new TWEEN.Tween({ x: camera.position.x, y: camera.position.y, z: camera.position.z })
+    .to({ x: camera.position.x, y: camera.position.y, z: -1000 }, 4000)
+    .easing(TWEEN.Easing.Circular.In);
+
+  let updateMovimiento = (object) => {
+    camera.position.set(object.x, object.y, object.z)
+  };
+
+  cameraTween.onUpdate(updateMovimiento);
+
+  cameraTween.start();
+}
+
 window.addEventListener('resize', onWindowResize);
+window.addEventListener('click', enterPortal);
 
 // Variables de rebote
 let cant = 0;
