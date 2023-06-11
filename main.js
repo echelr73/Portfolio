@@ -9,13 +9,29 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import { Mesh } from 'three';
 
-let textMesh, pControl, scene, camera, renderer, clock, direction_light, portalLight, portalLight1;
+let textMesh, pControl, scene, camera, renderer, clock, direction_light, portalLight, portalLight1, starGeo, stars, vertices;
+vertices = {
+  positions: [],
+  accelerations: [],
+  velocities: [],
+};
 let portalParticles = [], smokeParticles = [];
+
+// Obtén la referencia al elemento .text-box
+const textBox = document.querySelector('.text-box');
+
+// Oculta el .text-box inicialmente
+textBox.style.display = 'none';
+
+// Mostrar el .text-box cuando las estrellas estén listas
+function showTextBox() {
+  textBox.style.display = 'block';
+}
 
 function initScene() {
   scene = new THREE.Scene();
   //scene.background = new THREE.Color(0x000000);
-  scene.fog = new THREE.Fog(0x000000, 0, 10000);
+  scene.fog = new THREE.Fog(0x000000, 0, 8000);
   camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 1000);
   camera.position.z = 1000;
 
@@ -35,11 +51,12 @@ function initScene() {
   renderer = new THREE.WebGLRenderer();
   renderer.setClearColor(0x000000, 1);
   renderer.setSize(window.innerWidth, window.innerHeight - 2);
-  renderer.setPixelRatio(window.devicePixelRatio);
+  //renderer.setPixelRatio(window.devicePixelRatio);
 
   document.body.appendChild(renderer.domElement);
   particleSetup();
 }
+
 function particleSetup() {
   let portalLoader = new THREE.TextureLoader();
 
@@ -102,7 +119,7 @@ loader.load('https://threejs.org/examples/fonts/optimer_regular.typeface.json', 
   scene.add(textMesh);
 
   const textTween = new TWEEN.Tween({ x: getPositionCenter(textMesh), y: 0, z: -150 })
-    .to({ x: getPositionCenter(textMesh), y: 0, z: 950 }, 4000)
+    .to({ x: getPositionCenter(textMesh), y: 0, z: 950 }, 3000)
     .easing(TWEEN.Easing.Bounce.Out);
 
   const updateMovimiento = (object) => {
@@ -130,23 +147,55 @@ function getPositionCenter(objectMesh) {
 
 function enterPortal() {
   const cameraTween = new TWEEN.Tween({ x: camera.position.x, y: camera.position.y, z: camera.position.z })
-    .to({ x: camera.position.x, y: camera.position.y, z: -1000 }, 4000)
-    .easing(TWEEN.Easing.Circular.In);
+    .to({ x: camera.position.x, y: camera.position.y, z: -1000 }, 6000)
+    .easing(TWEEN.Easing.Quadratic.In);
 
   let updateMovimiento = (object) => {
-    camera.position.set(object.x, object.y, object.z)
+    camera.position.set(object.x, object.y, object.z);
+    camera.rotation.z += 0.002;
   };
 
   cameraTween.onUpdate(updateMovimiento);
 
   cameraTween.start();
+  initStar();
 }
 
 window.addEventListener('resize', onWindowResize);
 window.addEventListener('click', enterPortal);
 
-// Variables de rebote
-let cant = 0;
+function initStar() {
+  starGeo = new THREE.BufferGeometry(); // Crea una BufferGeometry vacía
+
+  for (let i = 0; i < 3000; i++) {
+    vertices.positions.push(
+      Math.random() * 800 - 400,
+      Math.random() * 800 - 400,
+      Math.random() * -1500);
+    if (i % 3 === 0) {
+      vertices.accelerations.push(0);
+      vertices.velocities.push(.2);
+    }
+  }
+  starGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices.positions), 3));
+
+  let sprite = new THREE.TextureLoader().load('sprite.png');
+  let starMaterial = new THREE.PointsMaterial({
+    color: 0xaaaaaa,
+    size: 0.7,
+    map: sprite,
+    transparent: true
+  });
+
+  stars = new THREE.Points(starGeo, starMaterial);
+  scene.add(stars);
+
+  setTimeout(function() {
+    showTextBox();
+  }, 6000);
+  
+}
+
 function animate() {
   TWEEN.update();
   requestAnimationFrame(animate);
@@ -161,13 +210,6 @@ function animate() {
 
   if (Math.random() > 0.9)
     portalLight.power = 350 + Math.random() * 500;
-
-  /*   if (textMesh.position.z <= 950) {
-      textMesh.position.z += (cant > 0 && cant<= 1) ? 0.8 : (cant >1 && cant <=2) ? 0.5 : 5.5;
-    }else if (cant < 2){
-      cant++;
-      textMesh.position.z = 935
-    } */
 
   //camera.lookAt(space.position);
   renderer.render(scene, camera);
