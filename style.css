@@ -26,4 +26,8 @@
     cursor: pointer;
     color: white;
   }
+
+  a{
+    text-decoration: none;
+  }
   
