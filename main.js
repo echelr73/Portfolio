@@ -15,7 +15,10 @@ vertices = {
   accelerations: [],
   velocities: [],
 };
+let firstClick = true;
 let portalParticles = [], smokeParticles = [];
+
+document.body.style.cursor = 'pointer';
 
 // Obtén la referencia al elemento .text-box
 const textBox = document.querySelector('.text-box');
@@ -146,6 +149,8 @@ function getPositionCenter(objectMesh) {
 }
 
 function enterPortal() {
+  if (!firstClick) return;
+  document.body.style.cursor = 'auto';
   const cameraTween = new TWEEN.Tween({ x: camera.position.x, y: camera.position.y, z: camera.position.z })
     .to({ x: camera.position.x, y: camera.position.y, z: -1000 }, 6000)
     .easing(TWEEN.Easing.Quadratic.In);
@@ -159,6 +164,7 @@ function enterPortal() {
 
   cameraTween.start();
   initStar();
+  firstClick = false;
 }
 
 window.addEventListener('resize', onWindowResize);
@@ -190,10 +196,10 @@ function initStar() {
   stars = new THREE.Points(starGeo, starMaterial);
   scene.add(stars);
 
-  setTimeout(function() {
+  setTimeout(function () {
     showTextBox();
   }, 6000);
-  
+
 }
 
 function animate() {

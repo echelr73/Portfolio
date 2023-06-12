@@ -19,14 +19,6 @@
   margin-top: 20px;
 }
 
-/*   .button {
-    background-color: transparent;
-    border: 1px solid white;
-    padding: 10px 20px;
-    margin: 0 10px;
-    cursor: pointer;
-    color: white;
-  } */
 .button {
   --color: #FFFFFF;
   --color2: #6CB8F3;
