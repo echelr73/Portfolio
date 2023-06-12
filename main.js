@@ -7,7 +7,6 @@ import WebGL from 'three/addons/capabilities/WebGL.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
-import { Mesh } from 'three';
 
 let textMesh, pControl, scene, camera, renderer, clock, direction_light, portalLight, portalLight1, starGeo, stars, vertices;
 vertices = {
@@ -108,9 +107,9 @@ const loader = new FontLoader();
 
 loader.load('https://threejs.org/examples/fonts/optimer_regular.typeface.json', function (font) {
 
-  const textGeometry = new TextGeometry('Martin Echeverria', {
+  const textGeometry = new TextGeometry('MARTIN ECHEVERRIA', {
     font: font,
-    size: 14,
+    size: 12,
     height: 1
   });
   const textMaterial = new THREE.MeshLambertMaterial({ color: 0x6CB8F3 });
@@ -147,7 +146,7 @@ function getPositionCenter(objectMesh) {
 
 function enterPortal() {
   const cameraTween = new TWEEN.Tween({ x: camera.position.x, y: camera.position.y, z: camera.position.z })
-    .to({ x: camera.position.x, y: camera.position.y, z: -1000 }, 6000)
+    .to({ x: camera.position.x, y: camera.position.y, z: -1000 }, 4000)
     .easing(TWEEN.Easing.Quadratic.In);
 
   let updateMovimiento = (object) => {
@@ -192,7 +191,7 @@ function initStar() {
 
   setTimeout(function() {
     showTextBox();
-  }, 6000);
+  }, 4000);
   
 }
 
@@ -230,4 +229,5 @@ function onWindowResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.render(scene, camera);
 }
+
 
