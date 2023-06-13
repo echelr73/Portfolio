@@ -9,7 +9,7 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import { Mesh } from 'three';
 
-let textMesh, pControl, scene, camera, renderer, clock, direction_light, portalLight, portalLight1, starGeo, stars, vertices;
+let textMesh, pControl, scene, camera, renderer, clock, textGeometry, textMaterial, direction_light, portalLight, portalLight1, starGeo, stars, vertices;
 vertices = {
   positions: [],
   accelerations: [],
@@ -111,12 +111,12 @@ const loader = new FontLoader();
 
 loader.load('https://threejs.org/examples/fonts/optimer_regular.typeface.json', function (font) {
 
-  const textGeometry = new TextGeometry('Martin Echeverria', {
+  textGeometry = new TextGeometry('Martin Echeverria', {
     font: font,
     size: 14,
     height: 1
   });
-  const textMaterial = new THREE.MeshLambertMaterial({ color: 0x6CB8F3 });
+  textMaterial = new THREE.MeshLambertMaterial({ color: 0x6CB8F3 });
   textMesh = new THREE.Mesh(textGeometry, textMaterial);
   //textMesh.position.set(-52.5, 0, 950);
   scene.add(textMesh);
@@ -158,6 +158,24 @@ function enterPortal() {
   let updateMovimiento = (object) => {
     camera.position.set(object.x, object.y, object.z);
     camera.rotation.z += 0.002;
+    if (camera.position.z <= 800) {
+      scene.remove(textMesh);
+      textGeometry.dispose();
+      textMaterial.dispose();
+    }
+    if (camera.position.z <= -100) {
+      // Iterar sobre los objetos agregados a la escena
+      for (let i = 0; i < scene.children.length; i++) {
+        const object = scene.children[i];
+
+        // Acceder a las propiedades del objeto
+        if (object.material instanceof THREE.MeshStandardMaterial)
+          scene.remove(object);
+        // Otras propiedades específicas del objeto que quieras imprimir
+
+        // Puedes hacer lo que desees con la información del objeto aquí
+      }
+    }
   };
 
   cameraTween.onUpdate(updateMovimiento);
@@ -171,6 +189,7 @@ window.addEventListener('resize', onWindowResize);
 window.addEventListener('click', enterPortal);
 
 function initStar() {
+
   starGeo = new THREE.BufferGeometry(); // Crea una BufferGeometry vacía
 
   for (let i = 0; i < 3000; i++) {
