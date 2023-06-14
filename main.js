@@ -5,11 +5,12 @@ import * as TWEEN from '@tweenjs/tween.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import WebGL from 'three/addons/capabilities/WebGL.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TTFLoader } from 'three/addons/loaders/TTFLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import { Mesh } from 'three';
 
-let textMesh, pControl, scene, camera, renderer, clock, textGeometry, textMaterial, direction_light, portalLight, portalLight1, starGeo, stars, vertices;
+let textMesh, pControl, scene, camera, renderer, clock, textGeometry, textMaterial, direction_light,direction_light2, portalLight, portalLight1, starGeo, stars, vertices, newFont;
 vertices = {
   positions: [],
   accelerations: [],
@@ -107,12 +108,13 @@ function particleSetup() {
 }
 initScene();
 
-const loader = new FontLoader();
+const fontLoader = new FontLoader();
+const loader = new TTFLoader();
 
-loader.load('https://threejs.org/examples/fonts/optimer_regular.typeface.json', function (font) {
-
+loader.load('font/Ransom.ttf', function (font) {
+  newFont = fontLoader.parse(font);
   textGeometry = new TextGeometry('Martin Echeverria', {
-    font: font,
+    font: newFont,
     size: 14,
     height: 1
   });
