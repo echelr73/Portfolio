@@ -10,7 +10,7 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import { Mesh } from 'three';
 
-let textMesh, pControl, scene, camera, renderer, clock, textGeometry, textMaterial, direction_light,direction_light2, portalLight, portalLight1, starGeo, stars, vertices, newFont;
+let textMeshTitle, textMeshSubtitle, pControl, scene, camera, renderer, clock, textGeometryTitle, textGeometrySubtitle, textMaterial, direction_light,direction_light2, portalLight, portalLight1, starGeo, stars, vertices, newFont;
 vertices = {
   positions: [],
   accelerations: [],
@@ -109,26 +109,52 @@ function particleSetup() {
 initScene();
 
 const fontLoader = new FontLoader();
-const loader = new TTFLoader();
+const loaderTitle = new TTFLoader();
+const loaderSubtitle = new TTFLoader();
 
-loader.load('font/Ransom.ttf', function (font) {
+loaderTitle.load('font/Mulish-SemiBold.ttf', function (font) {
   newFont = fontLoader.parse(font);
-  textGeometry = new TextGeometry('Martin Echeverria', {
+  textGeometryTitle = new TextGeometry('MARTIN ECHEVERRIA', {
     font: newFont,
-    size: 14,
+    size: 8,
     height: 1
   });
   textMaterial = new THREE.MeshLambertMaterial({ color: 0x6CB8F3 });
-  textMesh = new THREE.Mesh(textGeometry, textMaterial);
+  textMeshTitle = new THREE.Mesh(textGeometryTitle, textMaterial);
   //textMesh.position.set(-52.5, 0, 950);
-  scene.add(textMesh);
+  scene.add(textMeshTitle);
 
-  const textTween = new TWEEN.Tween({ x: getPositionCenter(textMesh), y: 0, z: -150 })
-    .to({ x: getPositionCenter(textMesh), y: 0, z: 950 }, 3000)
+  const textTween = new TWEEN.Tween({ x: getPositionCenter(textMeshTitle), y: 0, z: -150 })
+    .to({ x: getPositionCenter(textMeshTitle), y: 0, z: 950 }, 3000)
     .easing(TWEEN.Easing.Bounce.Out);
 
   const updateMovimiento = (object) => {
-    textMesh.position.set(object.x, object.y, object.z)
+    textMeshTitle.position.set(object.x, object.y, object.z)
+  };
+
+  textTween.onUpdate(updateMovimiento);
+
+  textTween.start();
+});
+
+loaderSubtitle.load('font/MuktaVaani-ExtraLight.ttf', function (font) {
+  newFont = fontLoader.parse(font);
+  textGeometrySubtitle = new TextGeometry('Fullstack Developer', {
+    font: newFont,
+    size: 8,
+    height: 1
+  });
+  textMeshSubtitle = new THREE.Mesh(textGeometrySubtitle, textMaterial);
+  //textMeshTitle.position.set(-52.5, 0, 950);
+  scene.add(textMeshSubtitle);
+
+  const textTween = new TWEEN.Tween({ x: getPositionCenter(textMeshSubtitle), y: 0, z: -150 })
+    .to({ x: getPositionCenter(textMeshSubtitle), y: -10, z: 950 }, 3000)
+    .easing(TWEEN.Easing.Circular.In)
+    .delay(1000);
+
+  const updateMovimiento = (object) => {
+    textMeshSubtitle.position.set(object.x, object.y, object.z)
   };
 
   textTween.onUpdate(updateMovimiento);
@@ -161,8 +187,10 @@ function enterPortal() {
     camera.position.set(object.x, object.y, object.z);
     camera.rotation.z += 0.002;
     if (camera.position.z <= 800) {
-      scene.remove(textMesh);
-      textGeometry.dispose();
+      scene.remove(textMeshTitle);
+      scene.remove(textMeshSubtitle);
+      textGeometryTitle.dispose();
+      textGeometrySubtitle.dispose();
       textMaterial.dispose();
     }
     if (camera.position.z <= -100) {
